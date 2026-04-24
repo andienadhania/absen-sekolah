@@ -15,13 +15,23 @@ import { cn } from '../../lib/utils';
 
 export default function Overview() {
   const { profile } = useAuth();
+  const isGuru = profile?.role === 'guru' || profile?.role === 'admin';
+  const isSiswa = profile?.role === 'siswa';
 
-  const stats = [
-    { name: 'Kehadiran', value: '98.5%', icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+  const stats = isGuru ? [
+    { name: 'Total Siswa', value: '1,248', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
+    { name: 'Kehadiran Hari Ini', value: '94.2%', icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
+    { name: 'Ujian Aktif', value: '12 Sesi', icon: BookOpen, color: 'text-rose-600', bg: 'bg-rose-50' },
+    { name: 'Rasio Kelulusan', value: '98%', icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
+  ] : [
+    { name: 'Kehadiran Saya', value: '98.5%', icon: CheckCircle, color: 'text-emerald-600', bg: 'bg-emerald-50' },
     { name: 'Ujian Aktif', value: '3 Mapel', icon: BookOpen, color: 'text-rose-600', bg: 'bg-rose-50' },
-    { name: 'Siswa SMK', value: '1,248', icon: Users, color: 'text-blue-600', bg: 'bg-blue-50' },
-    { name: 'Prestasi', value: '45+', icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { name: 'Nilai Rata-rata', value: '88.5', icon: Trophy, color: 'text-amber-600', bg: 'bg-amber-50' },
+    { name: 'Sikap / Poin', value: '100', icon: Activity, color: 'text-blue-600', bg: 'bg-blue-50' },
   ];
+
+  const personalPoin = isSiswa ? 100 : 0;
+  const personalTasks = isSiswa ? 4 : (isGuru ? 2 : 0);
 
   return (
     <div className="space-y-12 pb-20">
@@ -38,11 +48,13 @@ export default function Overview() {
               className="inline-flex items-center gap-2 px-4 py-1.5 bg-white/10 rounded-full border border-white/5 mb-6"
             >
               <Activity className="w-3.5 h-3.5 text-primary" />
-              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">Sistem Akademik Online v2.4</span>
+              <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/70">
+                {isGuru ? 'Teacher Dashboard' : (isSiswa ? 'Student Dashboard' : 'System Admin')} • SMK Prima v2.4
+              </span>
             </motion.div>
             <h1 className="text-4xl md:text-5xl font-black tracking-tighter leading-none mb-4">
               SELAMAT DATANG, <br />
-              <span className="text-primary italic animate-pulse">{profile?.name?.toUpperCase()}</span>
+              <span className="text-primary italic animate-pulse">{profile?.name?.toUpperCase() || 'PENGGUNA'}</span>
             </h1>
             <p className="text-slate-400 font-bold text-sm uppercase tracking-widest max-w-lg mb-8">
               Pusat kendali akademik SMK Prima Unggul Tangerang Selatan. Siap mencetak generasi cerdas dan beradab.
@@ -53,18 +65,33 @@ export default function Overview() {
           </div>
 
           <div className="flex flex-col gap-3">
-            <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl min-w-[240px]">
-              <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Poin Kedisiplinan</p>
-              <div className="flex items-end justify-between">
-                <span className="text-3xl font-black">100</span>
-                <span className="text-[10px] font-black text-emerald-500 uppercase">Sangat Baik</span>
+            {isSiswa && (
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl min-w-[240px]">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Poin Kedisiplinan</p>
+                <div className="flex items-end justify-between">
+                  <span className="text-3xl font-black">{personalPoin}</span>
+                  <span className="text-[10px] font-black text-emerald-500 uppercase">Sangat Baik</span>
+                </div>
               </div>
-            </div>
+            )}
+            
+            {isGuru && (
+              <div className="bg-white/5 backdrop-blur-xl border border-white/10 p-6 rounded-3xl min-w-[240px]">
+                <p className="text-[10px] font-black text-slate-500 uppercase tracking-widest mb-2">Kehadiran Kelas</p>
+                <div className="flex items-end justify-between">
+                  <span className="text-3xl font-black">94%</span>
+                  <span className="text-[10px] font-black text-emerald-500 uppercase">Aktif</span>
+                </div>
+              </div>
+            )}
+
             <div className="bg-primary p-6 rounded-3xl shadow-xl shadow-rose-900/40">
-              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-2">Tugas Berjalan</p>
+              <p className="text-[10px] font-black text-white/50 uppercase tracking-widest mb-2">
+                {isGuru ? 'Verifikasi Tugas' : 'Tugas Berjalan'}
+              </p>
               <div className="flex items-end justify-between">
-                <span className="text-3xl font-black">04</span>
-                <span className="text-[10px] font-black text-white uppercase bg-white/20 px-2 py-1 rounded-lg">Deadline</span>
+                <span className="text-3xl font-black">{personalTasks.toString().padStart(2, '0')}</span>
+                <span className="text-[10px] font-black text-white uppercase bg-white/20 px-2 py-1 rounded-lg">Update</span>
               </div>
             </div>
           </div>
@@ -102,18 +129,27 @@ export default function Overview() {
               <div className="w-10 h-10 bg-slate-900 rounded-xl flex items-center justify-center text-white">
                 <Calendar className="w-5 h-5" />
               </div>
-              <h3 className="font-black text-slate-800 text-sm uppercase tracking-[0.25em]">Agenda Sekolah Terbaru</h3>
+              <h3 className="font-black text-slate-800 text-sm uppercase tracking-[0.25em]">
+                {isGuru ? 'Review Tugas Terbaru' : 'Agenda Belajar & Sekolah'}
+              </h3>
             </div>
-            <button className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline decoration-2 underline-offset-4">Lihat Calendar</button>
+            <button className="text-primary text-[10px] font-black uppercase tracking-widest hover:underline decoration-2 underline-offset-4">
+              {isGuru ? 'Buka Portofolio' : 'Lihat Jadwal'}
+            </button>
           </div>
           
           <div className="flex-1 p-6">
-            {[
-              { title: 'Ujian Kompetensi Keahlian (UKK)', date: '21 Juni 2026', type: 'PENTING', color: 'bg-rose-50 text-rose-600' },
-              { title: 'Workshop AI Professional', date: '15 Mei 2026', type: 'WORKSHOP', color: 'bg-blue-50 text-blue-600' },
-              { title: 'Kunjungan Industri ke Jakarta', date: '08 Mei 2026', type: 'INTERNAL', color: 'bg-emerald-50 text-emerald-600' },
-              { title: 'Buka Bersama OSIS & Alumni', date: 'Kemarin', type: 'INFO', color: 'bg-slate-50 text-slate-500' },
-            ].map((item, i) => (
+            {(isGuru ? [
+              { title: 'Tugas Dasar Desain - Andi XII TKJ 1', date: '10 Menit Lalu', type: 'PENDING', color: 'bg-rose-50 text-rose-600' },
+              { title: 'Kuis Jaringan - Siti X TKJ 2', date: '1 Jam Lalu', type: 'SELESAI', color: 'bg-emerald-50 text-emerald-600' },
+              { title: 'Laporan Magang - Budi XI TKJ 1', date: '3 Jam Lalu', type: 'REVIEW', color: 'bg-blue-50 text-blue-600' },
+              { title: 'Ujian Bulanan - 24 Siswa', date: 'Kemarin', type: 'REKAP', color: 'bg-slate-50 text-slate-500' },
+            ] : [
+              { title: 'Matematika - Persamaan Linear', date: 'Pukul 07:30', type: 'KELAS', color: 'bg-emerald-50 text-emerald-600' },
+              { title: 'Bahasa Indonesia - Teks Laporan', date: 'Pukul 09:15', type: 'KELAS', color: 'bg-blue-50 text-blue-600' },
+              { title: 'Ujian Teori Kejuruan (Produktif)', date: '21 Juni 2026', type: 'PENTING', color: 'bg-rose-50 text-rose-600' },
+              { title: 'Workshop Web Development', date: '15 Mei 2026', type: 'INFO', color: 'bg-slate-50 text-slate-500' },
+            ]).map((item, i) => (
               <div key={i} className="flex items-center justify-between p-6 rounded-[2rem] hover:bg-slate-50 transition-all group relative overflow-hidden">
                 <div className="flex items-center gap-6">
                   <div className="flex flex-col items-center justify-center w-14 h-14 rounded-2xl bg-slate-50 font-black text-slate-400 group-hover:bg-slate-900 group-hover:text-white transition-all duration-500 text-[10px]">

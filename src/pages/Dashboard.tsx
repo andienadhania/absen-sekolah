@@ -40,11 +40,12 @@ export default function Dashboard() {
     { name: 'Dashboard', icon: Home, path: '/app', roles: ['admin', 'guru', 'tenaga', 'siswa'] },
     { name: 'Absensi Karyawan', icon: UserCheck, path: '/app/absensi-karyawan', roles: ['admin', 'guru', 'tenaga'] },
     { name: 'Absensi Siswa', icon: Calendar, path: '/app/absensi-siswa', roles: ['admin', 'guru'] },
+    { name: 'Kehadiran Saya', icon: FileText, path: '/app/rekap-absensi', roles: ['siswa'] },
     { name: 'Rekap Absensi', icon: FileText, path: '/app/rekap-absensi', roles: ['admin', 'guru'] },
-    { name: 'Data Siswa', icon: Users, path: '/app/data-siswa', roles: ['admin'] },
+    { name: 'Data Siswa', icon: Users, path: '/app/data-siswa', roles: ['admin', 'guru'] },
     { name: 'User Management', icon: Settings, path: '/app/user-management', roles: ['admin'] },
-    { name: 'Ujian Online', icon: BookOpen, path: '/app/ujian', roles: ['siswa'] },
-    { name: 'Nilai Saya', icon: GraduationCap, path: '/app/nilai', roles: ['siswa'] },
+    { name: 'Ujian Online', icon: BookOpen, path: '/app/ujian', roles: ['admin', 'guru', 'siswa'] },
+    { name: 'Hasil Ujian', icon: GraduationCap, path: '/app/nilai', roles: ['admin', 'guru', 'siswa'] },
   ].filter(item => item.roles.includes(role || ''));
 
   return (

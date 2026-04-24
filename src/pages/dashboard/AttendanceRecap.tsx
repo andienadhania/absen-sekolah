@@ -1,9 +1,78 @@
 import { useState } from 'react';
+import { useAuth } from '../../hooks/useAuth';
 import { Calendar, Search, Filter, Download, ArrowRight } from 'lucide-react';
 import { cn } from '../../lib/utils';
 
 export default function AttendanceRecap() {
+  const { profile } = useAuth();
   const [type, setType] = useState<'siswa' | 'karyawan'>('siswa');
+  const isSiswa = profile?.role === 'siswa';
+
+  if (isSiswa) {
+    return (
+      <div className="space-y-8">
+        <div>
+          <h2 className="text-3xl font-black text-slate-800 uppercase tracking-tighter">Kehadiran Saya</h2>
+          <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.2em] mt-2">Rekam jejak kedisiplinan belajar di SMK Prima</p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+          {[
+            { label: 'Hadir', value: '142', sub: 'Hari', color: 'bg-emerald-50 text-emerald-600' },
+            { label: 'Sakit / Izin', value: '03', sub: 'Hari', color: 'bg-amber-50 text-amber-600' },
+            { label: 'Alpha', value: '00', sub: 'Hari', color: 'bg-slate-50 text-slate-400' },
+          ].map((stat, i) => (
+            <div key={i} className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-xl shadow-slate-200/50">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest mb-4">{stat.label}</p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-black text-slate-900 tracking-tighter">{stat.value}</span>
+                <span className="text-[10px] font-black text-slate-400 uppercase">{stat.sub}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+
+        <div className="bg-white rounded-[3rem] border border-slate-100 shadow-2xl shadow-slate-200/50 overflow-hidden">
+          <div className="p-10 border-b border-slate-50 bg-slate-50/50">
+            <h3 className="font-black text-slate-800 text-sm uppercase tracking-[0.25em]">Riwayat Absensi Terakhir</h3>
+          </div>
+          <div className="p-6">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left">
+                <thead>
+                  <tr className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                    <th className="px-6 py-4">Tanggal</th>
+                    <th className="px-6 py-4">Waktu Masuk</th>
+                    <th className="px-6 py-4">Status</th>
+                    <th className="px-6 py-4">Keterangan</th>
+                  </tr>
+                </thead>
+                <tbody className="text-xs font-bold text-slate-600">
+                  {[
+                    { date: '24 Apr 2026', time: '06:45', status: 'HADIR', badge: 'bg-emerald-50 text-emerald-600' },
+                    { date: '23 Apr 2026', time: '06:55', status: 'HADIR', badge: 'bg-emerald-50 text-emerald-600' },
+                    { date: '22 Apr 2026', time: '07:10', status: 'TERLAMBAT', badge: 'bg-amber-50 text-amber-600' },
+                    { date: '21 Apr 2026', time: '-', status: 'IZIN', badge: 'bg-blue-50 text-blue-600' },
+                  ].map((row, i) => (
+                    <tr key={i} className="border-t border-slate-50 hover:bg-slate-50 transition-colors">
+                      <td className="px-6 py-5 uppercase tracking-tighter">{row.date}</td>
+                      <td className="px-6 py-5 font-mono">{row.time}</td>
+                      <td className="px-6 py-5">
+                        <span className={cn("px-3 py-1 rounded-full text-[9px] font-black tracking-widest", row.badge)}>
+                          {row.status}
+                        </span>
+                      </td>
+                      <td className="px-6 py-5 text-slate-400">Tercatat Sistem</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-8">

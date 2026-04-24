@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import type { UserProfile } from '../types';
+import type { UserProfile, UserRole } from '../types';
 import { User } from '@supabase/supabase-js';
 
 interface AuthContextType {
@@ -18,48 +18,36 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    // Check initial session
-    supabase.auth.getSession().then(({ data: { session } }) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setLoading(false);
-      }
-    });
-
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-      setUser(session?.user ?? null);
-      if (session?.user) {
-        fetchProfile(session.user.id);
-      } else {
-        setProfile(null);
-        setLoading(false);
-      }
-    });
-
-    return () => subscription.unsubscribe();
+    // FORCE MOCK MODE: App is now completely demo-based
+    const mockRole = localStorage.getItem('mock_role') as UserRole || null;
+    const mockName = localStorage.getItem('mock_name') || null;
+    
+    if (mockRole) {
+      setProfile({
+        id: 'mock-user',
+        email: `guest-${mockRole}@smkprima.sch.id`,
+        name: mockName || (mockRole === 'guru' ? 'Guru SMK Prima' : 'Siswa SMK Prima'),
+        role: mockRole,
+        created_at: new Date().toISOString()
+      });
+      setUser({ id: 'mock-user' } as User);
+    } else {
+      setProfile(null);
+      setUser(null);
+    }
+    
+    setLoading(false);
   }, []);
 
-  async function fetchProfile(uid: string) {
-    try {
-      const { data, error } = await supabase
-        .from('users')
-        .select('*')
-        .eq('id', uid)
-        .single();
-      
-      if (error) throw error;
-      setProfile(data);
-    } catch (error) {
-      console.error('Error fetching profile:', error);
-    } finally {
-      setLoading(false);
-    }
+  async function fetchProfile(_uid: string) {
+    // Not needed in purely demo mode
+    setLoading(false);
   }
 
   const signOut = async () => {
-    await supabase.auth.signOut();
+    localStorage.removeItem('mock_role');
+    localStorage.removeItem('mock_name');
+    window.location.href = '/login';
   };
 
   return (
